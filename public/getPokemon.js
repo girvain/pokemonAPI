@@ -4,6 +4,13 @@ var display = document.getElementById('pokemon-display');
 var treeContainer = document.getElementById('tree-container');
 var api = 'https://pokeapi.co/api/v2/pokemon/';
 
+class DataContainer {
+  constructor(name, children) {
+    this.name = name;
+    this.children = children;
+  }
+}
+
 enterButton.addEventListener('click', () => {
     fetch(api + userInput.value)
     .then(function(response) {
@@ -16,8 +23,11 @@ enterButton.addEventListener('click', () => {
       // clear containers, tree-container and pokemon-display div's
       while (display.firstChild) {
         display.removeChild(display.firstChild);
-        treeContainer.removeChild(treeContainer.firstChild);
+        if (treeContainer.firstChild) {
+          treeContainer.removeChild(treeContainer.firstChild);
+        }
       }
+      
       // Create an img and add the image from the API response to it
       let pokemonImg = document.createElement('IMG');
       pokemonImg.setAttribute('src', myJson.sprites.front_default);
@@ -51,67 +61,75 @@ function createPokeJson(pokemonObj) {
   return newPokemonObj;
 }
 
+/*
+ * Function to take a pokemon object property that contains a raw datatype,
+ * usually an integer, and place it in a DataContainer object and return it.
+ * The name param will be the name of the DataContainer
+ */
 function getPokemonProperty(pokemonObjProp, name) {
-  var attributeObj = {
-    name: name,
-    children: [],
-  };
-  attributeObj.children.push({name: pokemonObjProp.toString()});
-  //console.log(pokemonObjProp);
-  return attributeObj;
+  var dataContainer = new DataContainer(name, []);
+  dataContainer.children.push({name: pokemonObjProp.toString()});
+  return dataContainer;
 }
 
-function getPokemonAttribute(attribute, name) {
-  var attributeObj = {
-    name: name,
-    children: [],
-  };
+/*
+ * Function takes an array of objects labed attributeObjArray that is taken 
+ * from the JSON repsonse pokemon object. It then loops through
+ * each object to check firstly if it has a futher nested object. If so it 
+ * then checks if it has a property called name and if it contains a string.
+ * If so the value is extracted and placed in a new DataContainer which is
+ * then added to the children array of the parent DataContainer that will 
+ * be returned at completion. Name param is the name of the data container.
+ */
+function getPokemonAttribute(attributeObjArray, name) {
+  //Parent data container
+  var dataContainer = new DataContainer(name, []);
 
-  for (let i = 0; i < attribute.length; i++) {
-    var innerArray = Object.values(attribute[i]);
-
+  for (let i = 0; i < attributeObjArray.length; i++) {
+    var innerArray = Object.values(attributeObjArray[i]);
     for (var j = 0; j < innerArray.length; j++) {
       if (typeof innerArray[j] === 'object') {
         if (typeof innerArray[j].name === 'string') {
-          //console.log(innerArray[j].name);
-          attributeObj.children.push({
-            name: innerArray[j].name,
-            children: [],
-          });
+          dataContainer.children.push(new DataContainer(innerArray[j].name, []));
         }
       }
     }// end of inner for
   }// end of outer for
-
-  return attributeObj;
+  return dataContainer;
 }
 
-function getPokemonStats(attribute, name) {
-  // statnode contains an attribute object with a child array of stat names
-  var statnode = getPokemonAttribute(attribute, name);
-  // loop through the statnode's children array and add
-  for (let i = 0; i < statnode.children.length; i++) {
-    // get the base_stat and effort property from the stats array and
-    // passes in as attribute
-    var base_stat = attribute[i].base_stat;
-    var effort = attribute[i].effort;
-
-    statnode.children[i].children.push({name: 'base stat ' + base_stat});
-    statnode.children[i].children.push({name: 'effort ' + effort});
+/*
+ * Function that is a specialist for creating a container for the pokemon object's
+ * stats. MUST be passed the stats array from the pokemon JSON object. The function
+ * calls the getPokemonAttribute() and uses the returned DataContainer to add the 
+ * additional values to. It then loops through the attributeObjArray again
+ * (because the getPokemonAttribute() already done this) and looks up the additional
+ * properties to be added, puts them in their own dataContainer, then adds them to the
+ * children array of the parent dataContainer that is to be returned by the function.
+ */
+function getPokemonStats(attributeObjArray, name) {
+  // parent data container
+  var dataContainer = getPokemonAttribute(attributeObjArray, name);
+  // loop through the dataContainer's children array 
+  for (let i = 0; i < dataContainer.children.length; i++) {
+    // get ref to the base_stat and effort property from the attributeObjArray
+    var base_stat = attributeObjArray[i].base_stat;
+    var effort = attributeObjArray[i].effort;
+    // pass the base_stat and effort values to the corrisponding objects in container
+    dataContainer.children[i].children.push(new DataContainer('base stat ' + base_stat, []));
+    dataContainer.children[i].children.push(new DataContainer('effort' + effort, []));
   }// end of for
-  return statnode;
+  return dataContainer;
 }
 
-class attributeObj1 {
-  constructor(name, children) {
-    this.name = name;
-    this.children = children;
-  }
-}
-
-function nodeShrinker(attributeObj) {
-  var newAttributeObj = new attributeObj1(attributeObj.name, []);
-  let total = attributeObj.children.length;
+/*
+ * Function to take a DataContainer object and split it into 4 DataContainer
+ * objects, then place them inside a new DataContainer object and return it.
+ * MUST be passed a DataContainer that has >= 4 child objects.
+ */
+function nodeShrinker(dataContainer) {
+  var newDataContainer = new DataContainer(dataContainer.name, []);
+  let total = dataContainer.children.length;
   let subGroup = 0;
   if (total % 4 === 0) {
     subGroup = total / 4;
@@ -121,9 +139,9 @@ function nodeShrinker(attributeObj) {
   // function to create an object and fill it with the subset of
   // the moves, takes a name for the object
   function fillMoveObject(start, end, name) {
-    var moveObject = new attributeObj1(name, []);
+    var moveObject = new DataContainer(name, []);
     for (var i = start; i < end; i++) {
-      moveObject.children.push(attributeObj.children[i]);
+      moveObject.children.push(dataContainer.children[i]);
     }
     return moveObject;
   }
@@ -132,16 +150,20 @@ function nodeShrinker(attributeObj) {
   var set3 = fillMoveObject(subGroup * 2, subGroup * 3, 'set3');
   var set4 = fillMoveObject(subGroup * 3, total, 'set4');
 
-  newAttributeObj.children.push(set1);
-  newAttributeObj.children.push(set2);
-  newAttributeObj.children.push(set3);
-  newAttributeObj.children.push(set4);
+  newDataContainer.children.push(set1);
+  newDataContainer.children.push(set2);
+  newDataContainer.children.push(set3);
+  newDataContainer.children.push(set4);
 
-  return newAttributeObj;
+  return newDataContainer;
 }
 
-function getPokemonMoves(attribute) {
-  var movesObj = getPokemonAttribute(attribute, 'moves');
+/*
+ * Function is a simple extension of getPokemonAttribute() but passes the
+ * returned dataContainer to the nodeShrinker() and returns the new result.
+ */
+function getPokemonMoves(attributeObjArray) {
+  var movesObj = getPokemonAttribute(attributeObjArray, 'moves');
   var newMovesObj = nodeShrinker(movesObj);
   return newMovesObj;
 }
