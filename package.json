@@ -1,0 +1,14 @@
+{
+  "name": "pokemon",
+  "version": "1.0.0",
+  "description": "api",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "gavin ross",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
