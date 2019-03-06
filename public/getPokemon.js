@@ -1,28 +1,11 @@
 var enterButton = document.getElementById('enter-button');
 var userInput = document.getElementById('pokemon-input');
 var display = document.getElementById('pokemon-display');
+var treeContainer = document.getElementById('tree-container');
 var api = 'https://pokeapi.co/api/v2/pokemon/';
 
 enterButton.addEventListener('click', () => {
-  /*$.get(api + userInput.value,*/
-  //{ },
-  //function (data, textStatus, jqXHR) {
-  //// success callback
-  //console.log(data);
-  //console.log(data.sprites.front_default);
-
-  //// clear container
-  //while (display.firstChild) {
-  //display.removeChild(display.firstChild);
-  //}
-  //// Create an element
-  //let pokemonImg = document.createElement('IMG');
-  //pokemonImg.setAttribute('src', data.sprites.front_default);
-  //display.append(pokemonImg);
-  //}
-  //);
-
-  fetch(api + userInput.value)
+    fetch(api + userInput.value)
     .then(function(response) {
       //console.log(response);
       return response.json();
@@ -30,17 +13,17 @@ enterButton.addEventListener('click', () => {
     .then(function(myJson) {
       console.log(myJson);
 
-      // clear container
+      // clear containers, tree-container and pokemon-display div's
       while (display.firstChild) {
         display.removeChild(display.firstChild);
+        treeContainer.removeChild(treeContainer.firstChild);
       }
-      // Create an element
+      // Create an img and add the image from the API response to it
       let pokemonImg = document.createElement('IMG');
       pokemonImg.setAttribute('src', myJson.sprites.front_default);
       display.append(pokemonImg);
 
       var newPokemon = createPokeJson(myJson);
-      //console.log(newPokemon);
 
       doD3(newPokemon);
     });
@@ -55,7 +38,6 @@ function createPokeJson(pokemonObj) {
 
   newPokemonObj.children.push(
   getPokemonAttribute(pokemonObj.abilities, 'abilities'));
-
   newPokemonObj.children.push(
     getPokemonProperty(pokemonObj.base_experience, 'base_experience')
   );
@@ -107,7 +89,6 @@ function getPokemonAttribute(attribute, name) {
 function getPokemonStats(attribute, name) {
   // statnode contains an attribute object with a child array of stat names
   var statnode = getPokemonAttribute(attribute, name);
-  //console.log(statnode);
   // loop through the statnode's children array and add
   for (let i = 0; i < statnode.children.length; i++) {
     // get the base_stat and effort property from the stats array and
