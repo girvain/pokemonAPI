@@ -14,12 +14,10 @@ class DataContainer {
 enterButton.addEventListener('click', () => {
     fetch(api + userInput.value)
     .then(function(response) {
-      //console.log(response);
       return response.json();
     })
     .then(function(myJson) {
       console.log(myJson);
-
       // clear containers, tree-container and pokemon-display div's
       while (display.firstChild) {
         display.removeChild(display.firstChild);
@@ -27,36 +25,47 @@ enterButton.addEventListener('click', () => {
           treeContainer.removeChild(treeContainer.firstChild);
         }
       }
-      
       // Create an img and add the image from the API response to it
       let pokemonImg = document.createElement('IMG');
       pokemonImg.setAttribute('src', myJson.sprites.front_default);
       display.append(pokemonImg);
 
       var newPokemon = createPokeJson(myJson);
-
       doD3(newPokemon);
     });
   console.log('enter Button triggered');
 });
 
+/*
+ * Function to create the main parent DataContainer to store all the nodes of the D3. It
+ * takes the JSON object response from the fetch query, creates a new DataContainer, then
+ * adds the following objects to the children array of the dataContainer using the 
+ * getPokemonAttribute(), getPokemonStats, and getPokemonProp functions. Then returns the
+ * fully filled dataContainer to be passed to the doD3() function in the dndTree.js file.
+ */
 function createPokeJson(pokemonObj) {
   // create the initial object container
-  var newPokemonObj = {};
-  newPokemonObj.name = pokemonObj.name;
-  newPokemonObj.children = [];
+  var newPokemonObj = new DataContainer(pokemonObj.name, []);
 
+  // add abilities
   newPokemonObj.children.push(
-  getPokemonAttribute(pokemonObj.abilities, 'abilities'));
+    getPokemonAttribute(pokemonObj.abilities, 'abilities'));
+  // add base_experience
   newPokemonObj.children.push(
-    getPokemonProperty(pokemonObj.base_experience, 'base_experience')
-  );
+    getPokemonProperty(pokemonObj.base_experience, 'base_experience'));
+  // add height
   newPokemonObj.children.push(getPokemonProperty(pokemonObj.height, 'height'));
+  // add id
   newPokemonObj.children.push(getPokemonProperty(pokemonObj.id, 'id'));
-  newPokemonObj.children.push(getPokemonMoves(pokemonObj.moves));
+  // add moves, the getPokemonAttribute() returns too many dataContainers so it's wrapped 
+  // with the  nodeShrinker wrapper
+  newPokemonObj.children.push(nodeShrinker(getPokemonAttribute(pokemonObj.moves, 'moves')));
+  // add game indices
   newPokemonObj.children.push(
     getPokemonAttribute(pokemonObj.game_indices, 'game indices'));
+  // add stats
   newPokemonObj.children.push(getPokemonStats(pokemonObj.stats, 'stats'));
+  // add type
   newPokemonObj.children.push(getPokemonAttribute(pokemonObj.types, 'type'));
   return newPokemonObj;
 }
@@ -157,14 +166,3 @@ function nodeShrinker(dataContainer) {
 
   return newDataContainer;
 }
-
-/*
- * Function is a simple extension of getPokemonAttribute() but passes the
- * returned dataContainer to the nodeShrinker() and returns the new result.
- */
-function getPokemonMoves(attributeObjArray) {
-  var movesObj = getPokemonAttribute(attributeObjArray, 'moves');
-  var newMovesObj = nodeShrinker(movesObj);
-  return newMovesObj;
-}
-
