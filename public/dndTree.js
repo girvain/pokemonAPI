@@ -50,8 +50,13 @@ function doD3(treeData) {
   var root;
 
   // size of the diagram
-  var viewerWidth = $(document).width();
+  // ======================== My Code ==================================//
+  //  I have added to the viewWidth var by subtracting 30% from the total width
+  
   var viewerHeight = $(document).height();
+  //var viewerWidth = $(document).width(); 
+  var viewerWidth = $(document).width() - ($(document).width() * 0.3);// replacement
+
 
   var tree = d3.layout.tree().size([viewerHeight, viewerWidth]);
 
@@ -379,11 +384,41 @@ function doD3(treeData) {
 
   //// Function to center node when clicked/dropped so node doesn't get lost when collapsing/moving with large amount of children.
 
+    /*function centerNode(source) {*/
+    //scale = zoomListener.scale();
+    //x = -source.y0;
+    //y = -source.x0;
+    //x = x * scale + viewerWidth / 2; // edit of 2 to being 2
+    //y = y * scale + viewerHeight / 2;
+    //d3.select('g')
+      //.transition()
+      //.duration(duration)
+      //.attr('transform', 'translate(' + x + ',' + y + ')scale(' + scale + ')');
+    //zoomListener.scale(scale);
+    //zoomListener.translate([x, y]);
+  /*}*/
+
+  /** 
+   * ========================= My Code ==================/
+   * The above function has been re-written so that on the first render of the nodes
+   * the root node will be placed an 4th from the edge instead of the center. After
+   * The initial rendering the function resumes normal flow. This is to ensure the 
+   * resizing works when opening and closing nodes as the 8th postioning removes the
+   * d3 off screen.
+   */
+  var firstRender = false; // added this global variable
   function centerNode(source) {
     scale = zoomListener.scale();
     x = -source.y0;
     y = -source.x0;
-    x = x * scale + viewerWidth / 2;
+    // ======================= My Code ==================/
+    if (!firstRender) {
+      x = x * scale + viewerWidth / 4; 
+      firstRender = true;
+    }else {
+      x = x * scale + viewerWidth / 2; 
+    }
+    // ==================================================/
     y = y * scale + viewerHeight / 2;
     d3.select('g')
       .transition()
@@ -608,5 +643,7 @@ function doD3(treeData) {
   // Layout the tree initially and center on the root node.
   update(root);
   centerNode(root);
+
 }
+
 

@@ -126,7 +126,7 @@ function getPokemonStats(attributeObjArray, name) {
     var effort = attributeObjArray[i].effort;
     // pass the base_stat and effort values to the corrisponding objects in container
     dataContainer.children[i].children.push(new DataContainer('base stat ' + base_stat, []));
-    dataContainer.children[i].children.push(new DataContainer('effort' + effort, []));
+    dataContainer.children[i].children.push(new DataContainer('effort ' + effort, []));
   }// end of for
   return dataContainer;
 }

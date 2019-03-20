@@ -131,17 +131,50 @@
     </ul>
 
     <!-- pokemon container -->
-    <div class="container">
-      <h1>Pokemon API</h1>
-      <div id="input-container">
-        <h2>Enter Your Pokemon</h2>
-        <input type="text" value="" name="pokemon-input" id="pokemon-input" />
-        <button id="enter-button">Enter</button>
+    <div class="container center">
+      <h3>Pokemon API</h3>
+      <div class="row">
+        <div class="col s6">
+          <!--<img src="./img/pokemon_PNG143.png" class="img">-->
+        </div>
+        <div class="col s12">
+          <img src="./img/pokemon_PNG148.png" class="img">
+        </div>
       </div>
-      <div id="pokemon-display"></div>
-      <div class="container"><div id="tree-container"></div></div>
+      <div class="container center">
+        <div class="row">
+          <!--<h5>Enter Your Pokemon</h5>-->
+          <p>
+            Welcome to the pokemon API where you can input your favorite pokemon
+            and view all of its infomation, from games it's featured in to move
+            lists and more.
+          </p>
+
+          <div class="inputfield col s6 offset-s3">
+            <input
+              type="text"
+              placeholder="pokemon"
+              name="pokemon-input"
+              id="pokemon-input"
+              class=""
+            />
+            <button
+              id="enter-button"
+              class="btn btn-large waves-effect waves-light purple darken-3"
+            >
+              Enter
+            </button>
+          </div>
+        </div>
+        <div id="pokemon-display"></div>
+      </div>
+      <!--<div class="container"><div id="tree-container"></div></div>-->
       <script src="dndTree.js" charset="utf-8"></script>
       <script src="getPokemon.js" charset="utf-8"></script>
     </div>
+    <div id="tree-container" class="container"></div>
+
+    <script src="addClass.js"></script>
   </body>
+
 </html>

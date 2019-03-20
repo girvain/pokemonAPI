@@ -1,38 +1,68 @@
 .node {
-    cursor: pointer;
-  }
+  cursor: pointer;
+}
 
-  .overlay{
-      background-color:#EEE;
-  }
-   
-  .node circle {
-    fill: #fff;
-    stroke: steelblue;
-    stroke-width: 1.5px;
-  }
-   
-  .node text {
-    font-size:10px; 
-    font-family:sans-serif;
-  }
-   
-  .link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-  }
+.overlay {
+  /*background-color: #eee;*/
+  background-color: #ffffff;
+}
 
-  .templink {
-    fill: none;
-    stroke: red;
-    stroke-width: 3px;
-  }
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
 
-  .ghostCircle.show{
-      display:block;
-  }
+.node text {
+  font-size: 10px;
+  font-family: sans-serif;
+}
 
-  .ghostCircle, .activeDrag .ghostCircle{
-       display: none;
-  }
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+.templink {
+  fill: none;
+  stroke: red;
+  stroke-width: 3px;
+}
+
+.ghostCircle.show {
+  display: block;
+}
+
+.ghostCircle,
+.activeDrag .ghostCircle {
+  display: none;
+}
+
+.img {
+  max-width: 300px;
+}
+
+#tree-container {
+  background-color: #ffffff;
+}
+
+/*svg {*/
+/*[> margin: auto;<]*/
+/*[>text-align: center;<]*/
+/*[>max-width: 80%;<]*/
+/*background-color: #ffffff;*/
+/*display: block;*/
+/*margin-left: auto;*/
+/*margin-right: auto;*/
+
+/*}*/
+
+/*svg {*/
+/*-webkit-box-shadow: 10px 10px 5px -12px rgba(0,0,0,0.75);*/
+/*-moz-box-shadow: 10px 10px 5px -12px rgba(0,0,0,0.75);*/
+/*box-shadow: 10px 10px 5px -12px rgba(0,0,0,0.75);*/
+/*border-width:1px;*/
+/*border-style:solid;*/
+/*border-color:#d2d2d2;*/
+/*}*/
