@@ -1,6 +1,4 @@
 * pin charmander to the root node
-* remove tree-constainer on each click
-* change heading
-* add github api
-* add instructuions
 * possibly add a measurement to the height on d3 node
+* error handling of pokemon not found
+* reposition screen to root node on button click

@@ -25,10 +25,10 @@ enterButton.addEventListener('click', () => {
           treeContainer.removeChild(treeContainer.firstChild);
         }
       }
-      // Create an img and add the image from the API response to it
-      let pokemonImg = document.createElement('IMG');
-      pokemonImg.setAttribute('src', myJson.sprites.front_default);
-      display.append(pokemonImg);
+      /*// Create an img and add the image from the API response to it*/
+      //let pokemonImg = document.createElement('IMG');
+      //pokemonImg.setAttribute('src', myJson.sprites.front_default);
+      //display.append(pokemonImg);
 
       var newPokemon = createPokeJson(myJson);
       doD3(newPokemon);

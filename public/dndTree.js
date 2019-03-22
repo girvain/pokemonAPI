@@ -52,8 +52,9 @@ function doD3(treeData) {
   // size of the diagram
   // ======================== My Code ==================================//
   //  I have added to the viewWidth var by subtracting 30% from the total width
+  //  I have also halfed the viewerHeight to make it more readable
   
-  var viewerHeight = $(document).height();
+  var viewerHeight = $(document).height() / 2; // the / 2 is a replacement
   //var viewerWidth = $(document).width(); 
   var viewerWidth = $(document).width() - ($(document).width() * 0.3);// replacement
 
@@ -401,7 +402,7 @@ function doD3(treeData) {
   /** 
    * ========================= My Code ==================/
    * The above function has been re-written so that on the first render of the nodes
-   * the root node will be placed an 4th from the edge instead of the center. After
+   * the root node will be placed an 8th from the edge instead of the center. After
    * The initial rendering the function resumes normal flow. This is to ensure the 
    * resizing works when opening and closing nodes as the 8th postioning removes the
    * d3 off screen.
@@ -413,7 +414,7 @@ function doD3(treeData) {
     y = -source.x0;
     // ======================= My Code ==================/
     if (!firstRender) {
-      x = x * scale + viewerWidth / 4; 
+      x = x * scale + viewerWidth / 8; 
       firstRender = true;
     }else {
       x = x * scale + viewerWidth / 2; 
