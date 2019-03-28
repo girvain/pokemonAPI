@@ -14,8 +14,8 @@ enterButton.addEventListener('click', () => {
   //window.scrollTo(0, 20000);
 
   //firstNode.scrollIntoView();
-  var firstNode = document.getElementById('tree-container');
-  firstNode.scrollIntoView();
+  // var firstNode = document.getElementById('tree-container');
+  // firstNode.scrollIntoView();
 
   // code to add a prompt after user has input a pokemon
   /*let container = enterButton.parentElement;*/

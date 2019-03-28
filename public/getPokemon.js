@@ -4,6 +4,7 @@ var display = document.getElementById('pokemon-display');
 var treeContainer = document.getElementById('tree-container');
 var api = 'https://pokeapi.co/api/v2/pokemon/';
 
+
 class DataContainer {
   constructor(name, children) {
     this.name = name;
@@ -12,7 +13,7 @@ class DataContainer {
 }
 
 enterButton.addEventListener('click', () => {
-    fetch(api + userInput.value)
+  fetch(api + userInput.value)
     .then(function(response) {
       return response.json();
     })
@@ -25,6 +26,11 @@ enterButton.addEventListener('click', () => {
           treeContainer.removeChild(treeContainer.firstChild);
         }
       }
+
+      // clear input box, remove error
+      userInput.value = '';
+      clearError(userInput.parentElement);
+
       /*// Create an img and add the image from the API response to it*/
       //let pokemonImg = document.createElement('IMG');
       //pokemonImg.setAttribute('src', myJson.sprites.front_default);
@@ -32,9 +38,33 @@ enterButton.addEventListener('click', () => {
 
       var newPokemon = createPokeJson(myJson);
       doD3(newPokemon);
+    })
+    .catch(err => {
+      console.log(err);
+      clearError(userInput.parentElement);
+      createErrorMsg();
     });
-  console.log('enter Button triggered');
+  //  console.log('enter Button triggered');
 });
+
+function createErrorMsg() {
+  const parent = userInput.parentElement;
+  const errMsg = document.createElement('p');
+  errMsg.innerHTML = 'Pokemon not Found!!!';
+  errMsg.style.color = 'red';
+  errMsg.id = 'error-message';
+  parent.appendChild(errMsg);
+  // clear input box and remove error mesg
+  userInput.value = '';
+
+}
+
+function clearError(parent) {
+  var errorElemt = document.getElementById('error-message');
+  if (errorElemt) {
+    parent.removeChild(errorElemt);
+  }
+}
 
 /*
  * Function to create the main parent DataContainer to store all the nodes of the D3. It
@@ -77,7 +107,9 @@ function createPokeJson(pokemonObj) {
  */
 function getPokemonProperty(pokemonObjProp, name) {
   var dataContainer = new DataContainer(name, []);
-  dataContainer.children.push({name: pokemonObjProp.toString()});
+  dataContainer.children.push({
+    name: pokemonObjProp.toString()
+  });
   return dataContainer;
 }
 
@@ -102,8 +134,8 @@ function getPokemonAttribute(attributeObjArray, name) {
           dataContainer.children.push(new DataContainer(innerArray[j].name, []));
         }
       }
-    }// end of inner for
-  }// end of outer for
+    } // end of inner for
+  } // end of outer for
   return dataContainer;
 }
 
@@ -127,7 +159,7 @@ function getPokemonStats(attributeObjArray, name) {
     // pass the base_stat and effort values to the corrisponding objects in container
     dataContainer.children[i].children.push(new DataContainer('base stat ' + base_stat, []));
     dataContainer.children[i].children.push(new DataContainer('effort ' + effort, []));
-  }// end of for
+  } // end of for
   return dataContainer;
 }
 
