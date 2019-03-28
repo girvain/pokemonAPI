@@ -1,10 +1,12 @@
 var enterButton = document.getElementById('enter-button');
 var userInput = document.getElementById('pokemon-input');
-var display = document.getElementById('pokemon-display');
 var treeContainer = document.getElementById('tree-container');
 var api = 'https://pokeapi.co/api/v2/pokemon/';
 
-
+/*
+ * Data Container creating pokemon attribute nodes to interact
+ * with the d3
+ */
 class DataContainer {
   constructor(name, children) {
     this.name = name;
@@ -12,43 +14,47 @@ class DataContainer {
   }
 }
 
+/*
+ * Listener for the enter button for the pokemon search. Uses
+ * fetch to query the pokemon API to get the corrisponding JSON
+ * data. Contains calls to the error functions below on success
+ * and failures of the ajax call.
+ */
 enterButton.addEventListener('click', () => {
   fetch(api + userInput.value)
     .then(function(response) {
       return response.json();
     })
     .then(function(myJson) {
-      console.log(myJson);
-      // clear containers, tree-container and pokemon-display div's
-      while (display.firstChild) {
-        display.removeChild(display.firstChild);
+      // clear the tree-container of the previous D3
+      while (treeContainer.firstChild) {
+        treeContainer.removeChild(treeContainer.firstChild);
         if (treeContainer.firstChild) {
           treeContainer.removeChild(treeContainer.firstChild);
         }
       }
-
       // clear input box, remove error
       userInput.value = '';
       clearError(userInput.parentElement);
-
-      /*// Create an img and add the image from the API response to it*/
-      //let pokemonImg = document.createElement('IMG');
-      //pokemonImg.setAttribute('src', myJson.sprites.front_default);
-      //display.append(pokemonImg);
 
       var newPokemon = createPokeJson(myJson);
       doD3(newPokemon);
     })
     .catch(err => {
-      console.log(err);
+      console.log(err);// log the error message from ajax req
       clearError(userInput.parentElement);
-      createErrorMsg();
+      createErrorMsg(userInput.parentElement);
     });
-  //  console.log('enter Button triggered');
 });
 
-function createErrorMsg() {
-  const parent = userInput.parentElement;
+/*
+ * Function to create a <p> element that contains an error message to inform the user
+ * That the pokemon name they input was not found. takes a parent element as an argument,
+ * creates an element, adds a color attribute and id to it, appends it to parent element
+ * then clears the text box for the next input.
+ */
+function createErrorMsg(parent) {
+  // const parent = userInput.parentElement;
   const errMsg = document.createElement('p');
   errMsg.innerHTML = 'Pokemon not Found!!!';
   errMsg.style.color = 'red';
@@ -59,6 +65,11 @@ function createErrorMsg() {
 
 }
 
+/*
+ * Function to remove the error message element from the DOM. Takes a parent element
+ * as an argument.
+ * @param 
+ */
 function clearError(parent) {
   var errorElemt = document.getElementById('error-message');
   if (errorElemt) {

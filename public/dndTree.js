@@ -25,7 +25,7 @@ OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*/
 
-/* NOTE: I have replace the 
+/* NOTE: I have replaced the
  * treeJSON = d3.json("flare.json", function(error, treeData) 
  * with a function called doD3(treeData) in order to break up the code and 
  * simplfy it. This was needed so that the api data can be manipulated to 
@@ -399,11 +399,12 @@ function doD3(treeData) {
     //zoomListener.translate([x, y]);
   /*}*/
 
-  /** 
+  /**
    * ========================= My Code ==================/
    * The above function has been re-written so that on the first render of the nodes
-   * the root node will be placed an 8th from the edge instead of the center. After
-   * The initial rendering the function resumes normal flow. This is to ensure the 
+   * the root node will be placed either a 3rd, an 8th or a 1/2 of the container width.
+   * This is based on the screen sizes of devices.
+   * After the initial rendering the function resumes normal flow. This is to ensure the 
    * resizing works when opening and closing nodes as the 8th postioning removes the
    * d3 off screen.
    */
@@ -414,9 +415,20 @@ function doD3(treeData) {
     y = -source.x0;
     // ======================= My Code ==================/
     if (!firstRender) {
-      x = x * scale + viewerWidth / 8; 
-      firstRender = true;
-    }else {
+      if (viewerWidth > 1000){
+        x = x * scale + viewerWidth / 3;
+        firstRender = true;
+      }
+      else if (viewerWidth > 450){
+        x = x * scale + viewerWidth / 8;
+        firstRender = true;
+      }
+      else {
+        x = x * scale + viewerWidth / 2;
+        firstRender = true;
+      }
+    }
+    else {
       x = x * scale + viewerWidth / 2; 
     }
     // ==================================================/
