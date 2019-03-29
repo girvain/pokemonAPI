@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>Pokemon API</title>
+        <link
+            rel="stylesheet"
+            href="css/mycss.css"
+            type="text/css"
+            media="screen"
+            title="no title"
+            charset="utf-8"
+        />
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/style.css" />
+        <!--Import materialize.css-->
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="css/materialize.min.css"
+            media="screen,projection"
+        />
+        <!--Let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Integrated Project 3 Web Application</title>
+    </head>
+
+    <body>
+        <!-- Navigation -->
+        <!-- Dropdown 1 - Projects -->
+        <ul id="dropdown1" class="dropdown-content">
+            <li><a href="weather.html" class="purple-text">Weather</a></li>
+            <li class="divider"></li>
+            <li><a href="earthquake.html" class="purple-text">Earthquakes</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Space</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">News</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Movies</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Health</a></li>
+        </ul>
+        <!-- Dropdown 2 - Tutorials -->
+        <ul id="dropdown2" class="dropdown-content">
+            <li><a href="#!" class="purple-text">Weather</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Earthquakes</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Space</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">News</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Movies</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Health</a></li>
+        </ul>
+        <!-- Dropdown 3 - Projects -->
+        <ul id="dropdown3" class="dropdown-content">
+            <li><a href="weather.html" class="purple-text">Weather</a></li>
+            <li class="divider"></li>
+            <li><a href="earthquake.html" class="purple-text">Earthquakes</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Space</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">News</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Movies</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Health</a></li>
+        </ul>
+        <!-- Dropdown 4 - Tutorials -->
+        <ul id="dropdown4" class="dropdown-content">
+            <li><a href="#!" class="purple-text">Weather</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Earthquakes</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Space</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">News</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Movies</a></li>
+            <li class="divider"></li>
+            <li><a href="#!" class="purple-text">Health</a></li>
+        </ul>
+        <!-- Main nav for screen -->
+        <nav class="z-depth-3 purple darken-3">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <a href="index.html" class="brand-logo"
+                    ><i class="material-icons">graphic_eq</i>IP3</a
+                                                                >
+                    <a href="#" data-target="mobile-demo" class="sidenav-trigger">
+                        <i class="material-icons">menu</i>
+                    </a>
+                    <ul class="right hide-on-med-and-down">
+                        <li>
+                            <a class="dropdown-trigger" href="#" data-target="dropdown3">
+                                Projects <i class="material-icons right">arrow_drop_down</i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-trigger" href="#" data-target="dropdown4">
+                                Tutorials <i class="material-icons right">arrow_drop_down</i>
+                            </a>
+                        </li>
+                        <li class="active"><a href="#">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidenav (hidden unless mobile) -->
+        <ul class="sidenav" id="mobile-demo">
+            <li><a href="#">MENU</a></li>
+            <li>
+                <a class="dropdown-trigger" href="#" data-target="dropdown1">
+                    Projects <i class="material-icons right">arrow_drop_down</i>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-trigger" href="#" data-target="dropdown2">
+                    Tutorials <i class="material-icons right">arrow_drop_down</i>
+                </a>
+            </li>
+            <li class="active"><a href="#">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        
+        <!--Page Content-->
+        <div class="custom-container container center">
+
+            <div class="row">
+                <div class="col s12 m8 offset-m2 l8 offset-l2">
+                    <button
+                        id="enter-button"
+                        class="btn btn-large waves-effect waves-light purple darken-3"
+                    >
+                        Enter
+                    </button>
+                </div>
+            </div>
+            <div id="tree-container"></div>
+        </div>
+        
+
+        <script src="https://d3js.org/d3.v3.min.js"></script>
+
+        <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+
+        <script src="js/dndTree.js" charset="utf-8"></script>
+        <script src="js/getPokemon.js" charset="utf-8"></script>
+        <script src="js/materialAddons.js"></script>
+    </body>
+</html>

@@ -21,23 +21,22 @@ class DataContainer {
  * and failures of the ajax call.
  */
 enterButton.addEventListener('click', () => {
-  fetch(api + userInput.value)
+  fetch(api + userInput.value.toLocaleLowerCase())
     .then(function(response) {
       return response.json();
     })
     .then(function(myJson) {
-      // clear the tree-container of the previous D3
-      while (treeContainer.firstChild) {
-        treeContainer.removeChild(treeContainer.firstChild);
-        if (treeContainer.firstChild) {
-          treeContainer.removeChild(treeContainer.firstChild);
-        }
-      }
-      // clear input box, remove error
-      userInput.value = '';
-      clearError(userInput.parentElement);
+      clearQueryData();
 
       var newPokemon = createPokeJson(myJson);
+
+      // add the doD3() to the window resize listener so the doD3 can be called
+      // with the latest pokemon object thanks to closures
+      window.addEventListener('resize', function() {
+        clearQueryData();
+        doD3(newPokemon);
+      });
+
       doD3(newPokemon);
     })
     .catch(err => {
@@ -45,6 +44,27 @@ enterButton.addEventListener('click', () => {
       clearError(userInput.parentElement);
       createErrorMsg(userInput.parentElement);
     });
+});
+
+/*
+ * Function to clear the tree-container div of the previous d3 visualisation
+ * and to clear the text in the input field.
+ */
+function clearQueryData() {
+  // clear the tree-container of the previous D3
+  while (treeContainer.firstChild) {
+    treeContainer.removeChild(treeContainer.firstChild);
+    if (treeContainer.firstChild) {
+      treeContainer.removeChild(treeContainer.firstChild);
+    }
+  }
+  // clear input box, remove error
+  userInput.value = '';
+  clearError(userInput.parentElement);
+}
+
+window.addEventListener('resize', function() {
+  
 });
 
 /*
@@ -68,7 +88,7 @@ function createErrorMsg(parent) {
 /*
  * Function to remove the error message element from the DOM. Takes a parent element
  * as an argument.
- * @param 
+ * @param
  */
 function clearError(parent) {
   var errorElemt = document.getElementById('error-message');
