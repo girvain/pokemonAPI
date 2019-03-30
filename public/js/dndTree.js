@@ -29,10 +29,15 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*/
  * treeJSON = d3.json("flare.json", function(error, treeData) 
  * with a function called doD3(treeData) in order to break up the code and 
  * simplfy it. This was needed so that the api data can be manipulated to 
- * match the example data that the dndTree.js is designed to recieve.
+ * match the example data that the dndTree.js is designed to recieve. The
+ * second argument nessessary when the function is used in a fullscreen
+ * context and takes a boolean variable.
+ * @param treeData object
+ * @param isfullscreen boolean
  */
 
-function doD3(treeData) {
+function doD3(treeData, isfullscreen) {
+
   // Get JSON data
 
   // Calculate total nodes, max label length
@@ -50,14 +55,19 @@ function doD3(treeData) {
   var root;
 
   // size of the diagram
+  var viewerHeight = $(document).height();
+  var viewerWidth = $(document).width();
+
   // ======================== My Code ==================================//
   //  I have added to the viewWidth var by subtracting 30% from the total width
-  //  I have also halfed the viewerHeight to make it more readable
-  
-  var viewerHeight = $(document).height() / 2; // the / 2 is a replacement
-  //var viewerWidth = $(document).width(); 
-  var viewerWidth = $(document).width() - ($(document).width() * 0.3);// replacement
-
+  //  I have also halfed the viewerHeight to make it more readable. The logic has
+  // been added to ensure this is only done on the pokemon page and not the fullscreen
+  // page, which requires the second argument "true".
+  if (!isfullscreen) {
+    viewerHeight = $(document).height() / 2; // the / 2 is a replacement
+    viewerWidth = $(document).width() - ($(document).width() * 0.3);// replacement
+  }
+  // ================================= ==================================//
 
   var tree = d3.layout.tree().size([viewerHeight, viewerWidth]);
 

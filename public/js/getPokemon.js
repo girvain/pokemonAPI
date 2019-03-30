@@ -2,6 +2,7 @@ var enterButton = document.getElementById('enter-button');
 var userInput = document.getElementById('pokemon-input');
 var treeContainer = document.getElementById('tree-container');
 var api = 'https://pokeapi.co/api/v2/pokemon/';
+var fullscreenBtn = document.getElementById('fullscreen-btn');
 
 /*
  * Data Container creating pokemon attribute nodes to interact
@@ -26,9 +27,8 @@ enterButton.addEventListener('click', () => {
       return response.json();
     })
     .then(function(myJson) {
-      clearQueryData();
-
       var newPokemon = createPokeJson(myJson);
+      var pokemonName = userInput.value.toLocaleLowerCase();
 
       // add the doD3() to the window resize listener so the doD3 can be called
       // with the latest pokemon object thanks to closures
@@ -37,7 +37,16 @@ enterButton.addEventListener('click', () => {
         doD3(newPokemon);
       });
 
+      // listener fuction to launch the pokemonFullScreen.html page with the
+      // user's latest pokemon name query as a string query
+      fullscreenBtn.addEventListener('click', () => {
+        window.open("../pokemonFullScreen.html?pokemon=" + pokemonName);
+      });
+
+      clearQueryData();
       doD3(newPokemon);
+      // show the fullscreen button now that it all works
+      fullscreenBtn.style.display = 'inline-block';
     })
     .catch(err => {
       console.log(err);// log the error message from ajax req
@@ -63,9 +72,8 @@ function clearQueryData() {
   clearError(userInput.parentElement);
 }
 
-window.addEventListener('resize', function() {
-  
-});
+
+
 
 /*
  * Function to create a <p> element that contains an error message to inform the user
