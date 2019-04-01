@@ -117,10 +117,10 @@
   </ul>
 
   <!--Page Content-->
-  <div class="container center">
-    <h2>Pokemon Tutorial</h2>
+  <div class="container">
+    <h2 class="center">Pokemon Tutorial</h2>
     <div class="row">
-      <div class="col s12">
+      <div class="col s12 m10 offset-m1 ">
         <h5>Intro</h5>
         <p>
           The pokemon Page is a collection of D3 visualisation technology, web API's,
@@ -128,30 +128,481 @@
           corisponding pages on this site.
         </p>
       </div>
-      <div class="col s12">
+      <div class="col s12 m10 offset-m1 ">
         <h5>The D3</h5>
         <p>
-            The D3 that is used to make this page was taken from
-            <a href="https://d3js.org/">d3js.org</a> which is a large collection of d3 examples with
-            information and code. The actual d3 project that is used as a data visualisation for
-            the page is by Rob Schmuecker and can be found
-            <a href="http://bl.ocks.org/robschmuecker/7880033">here</a>.
+          The D3 that is used to make this page was taken from
+          <a href="https://d3js.org/">d3js.org</a> which is a large collection of d3 examples with
+          information and code. The actual d3 project that is used as a data visualisation for
+          the page is by Rob Schmuecker and can be found
+          <a href="http://bl.ocks.org/robschmuecker/7880033">here</a>.
+          The code from this demo has been used as the base for the pokemon project but there has
+          been several edits to make it more more functional with the site and Pokemon API.
+          
+          As seen from the page demo, the d3 visualisation is rendered to the full width of the
+          screen and the height is calculated based on amount of nodes. The problem with this is
+          the user is unable to scroll the page when they reach the diagram because scroll is
+          over written with the zoom feature of the D3. In order to fixe this the page width needs
+          to be shortened on the main page and function as normal when the diagram is opened in a
+          new tab (fullscreen). This is done by adding to the viewWidth var by subtracting 30% from
+          the total width. ViewerHeight to make it more readable. The logic has
+          been added to ensure this is only done on the pokemon page and not the fullscreen
+          page, which requires the second argument "true". This variable will be added as an argument
+          to the main function.
+        </p>
 
-        </p>
-      </div>
-      <div class="col s12">
-        <h5>The Web API</h5>
-        <p>The pokemon Page is a collection of web framerworks and API's.
-        </p>
-      </div>
-      <div class="col s12">
-        <h5>The CSS/Javascript</h5>
+        <pre class="prettyprint left-align">
+  if (!isfullscreen) {
+    viewerHeight = $(document).height() / 2; // the / 2 is a replacement
+    viewerWidth = $(document).width() - ($(document).width() * 0.3);// replacement
+  }
+        </pre>
+
         <p>
-          The pokemon Page is a collection of web framerworks and API's.
-        </p>
+          The second edit is a rewrite of the centerNode function.
+          The original version of the function is to position the root node in the center of the
+          page. In the rewrite the first render of the nodes will place
+          the root node on either a 3rd, an 8th or a 1/2 of the container width.
+          This is based on the screen sizes of devices.
+          After the initial rendering the function resumes normal flow. This is to ensure the 
+          resizing works when opening and closing nodes as the 8th postioning removes the
+          d3 off screen.
+          <pre class="prettyprint left-align">
+  var firstRender = false; // added this global variable
+  function centerNode(source) {
+    scale = zoomListener.scale();
+    x = -source.y0;
+    y = -source.x0;
+    // ======================= My Code ==================/
+    if (!firstRender) {
+      if (viewerWidth > 1000){
+        x = x * scale + viewerWidth / 3;
+        firstRender = true;
+      }
+      else if (viewerWidth > 450){
+        x = x * scale + viewerWidth / 8;
+        firstRender = true;
+      }
+      else {
+        x = x * scale + viewerWidth / 2;
+        firstRender = true;
+      }
+    }
+    else {
+      x = x * scale + viewerWidth / 2; 
+    }
+    // ==================================================/
+    y = y * scale + viewerHeight / 2;
+    d3.select('g')
+      .transition()
+      .duration(duration)
+      .attr('transform', 'translate(' + x + ',' + y + ')scale(' + scale + ')');
+    zoomListener.scale(scale);
+    zoomListener.translate([x, y]);
+  }
+
+          </pre>
+          <p>
+            The last part was to edit the the main function to work with the pokemon api data
+            recieved and not a local json file.
+            The treeJSON = d3.json("flare.json", function(error, treeData) has been replaced
+            with a function called doD3(treeData isFullscreen) in order to break up the code and 
+            simplfy it. This was needed so that the api data can be manipulated to 
+            match the example data that the dndTree.js is designed to recieve (flare.json). The
+            second argument is only nessessary when the function is used in a fullscreen
+            context and takes a boolean variable.
+
+          </p>
+          <pre class="prettyprint left-align">
+function doD3(treeData, isfullscreen) { ... content }
+          </pre>
       </div>
+      <div class="col s12 m10 offset-m1">
+        <h5>The Web API</h5>
+        <p>
+          The API used to gather the data for this app is found
+          <a href="https://pokeapi.co/">here</a>.
+          As seen on the website documentation, there is a variety of ways to gather and
+          filter the data from the site. The goal is to display information about pokemon
+          so the 'https://pokeapi.co/api/v2/pokemon/...' is the url that is used. The ...
+          will be what the user has input on the site, more on that later.
+          The data will be gathered using the javascript fetch function.
+          (details of fetch on the technologies page).
+          There is a listener for the enter button for the pokemon search and that is where
+          the fetch function is placed. This function concatinates the url with the string
+          input from the user and converts it to lower case because the api does not handle
+          uppercase characters. It then uses the .then feature which is a new es6 feature of
+          javascript called promises (for details on promises see the technologies page). The
+          function gets the json data from the response, followed by another .then function
+          passing the data to it to create a pokemon object with the createPokeJson function.
+          (more on that in the next section).
+          <p><i>NOTE: This is a large function broken down into sections so it will appear to have
+            unclosed brakcets and parenthisis.</i></p>
+        </p>
+        <pre class="prettyprint left-align">
+enterButton.addEventListener('click', () => {
+  fetch(api + userInput.value.toLocaleLowerCase())
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (myJson) {
+      var newPokemon = createPokeJson(myJson);
+      var pokemonName = userInput.value.toLocaleLowerCase();
+        </pre>
 
+        <p>
+          The doD3 will need to be called on page resizing by the listener because this will
+          disrupt the layout and make it hard to use. In order to fix this the doD3() is
+          added to a window resize listener so the doD3 can be called,
+          with the latest pokemon object thanks to javascript closures, on any window 'resize'
+          events.
+        </p>
+        <pre class="prettyprint left-align">
+      window.addEventListener('resize', function () {
+        clearQueryData();
+        doD3(newPokemon);
+      });
+          </pre>
 
+          <p>
+          Now add a listener fuction to the fullscreen button to launch the pokemonFullScreen.html page with the
+          user's latest pokemon name query concatenated to the end of the string query.
+            For information on what a string query is visit
+            <a href="">this link</a>
+          </p>
+
+          <pre class="prettyprint left-align">
+      fullscreenBtn.addEventListener('click', () => {
+        window.open("../../projects/pokemonFullScreen.html?pokemon=" + pokemonName);
+      });
+          </pre>
+          <p>
+          Now there is a clear up function called (explained in next section) and the
+          doD3 function from the other script is called passing in the pokemon object.
+          </p>
+          <pre class="prettyprint left-align">
+      clearQueryData();
+      doD3(newPokemon);
+      // show the fullscreen button now that it all works
+      fullscreenBtn.style.display = 'inline-block';
+    })
+          </pre>
+          <p>
+          lastly there is a .catch function that comes with fetch that is to handle errors.
+          All this will do is log the error to the browsers console and call the clean up
+          functions.
+          </p>
+          <pre class="prettyprint left-align">
+    .catch(err => {
+      console.log(err);// log the error message from ajax req
+      clearError(userInput.parentElement);
+      createErrorMsg(userInput.parentElement);
+    });
+});
+          </pre>
+      </div>
+      <div class="col s12 m12 l10 offset-l1">
+        <h5>The Javascript</h5>
+        <h6>getPokemon.js</h6>
+        <p>
+          The pokemon.js file is the file that handles the references to DOM elements,
+          allocates listeners,  and removes error messages and user input. For Information
+          on what all these featues are see the technologies page in the DOM Manipulation
+          section.
+
+          The first part of the code is to get reference to the to the buttons, input box
+          and div container where the d3 is rendered which id dont below.
+        </p>
+        <pre class="prettyprint left-align">
+var enterButton = document.getElementById('enter-button');
+var userInput = document.getElementById('pokemon-input');
+var treeContainer = document.getElementById('tree-container');
+var api = 'https://pokeapi.co/api/v2/pokemon/';
+var fullscreenBtn = document.getElementById('fullscreen-btn');
+        </pre>
+
+        <p>
+          Next there needs to be a data structure in order to replicate the data stucture
+          the original d3 script uses. This is done by using a class, which is a new es56
+          feature of javascript. For more information on javascript class syntax see the
+          technology page in the es6 section.
+        </p>
+        <pre class="prettyprint left-align">
+class DataContainer {
+  constructor(name, children) {
+    this.name = name;
+    this.children = children;
+  }
+}
+        </pre>
+
+        <p>
+          Next is a function to create the main parent DataContainer to store all the nodes of the D3. It
+          takes the JSON object response from the fetch query, creates a new DataContainer, then
+          adds the following objects to the children array of the dataContainer using the 
+          getPokemonAttribute(), getPokemonStats, and getPokemonProp functions. Then returns the
+          fully filled dataContainer to be passed to the doD3() function in the dndTree.js file.
+        </p>
+        <pre class="prettyprint left-align">
+function createPokeJson(pokemonObj) {
+  // create the initial object container
+  var newPokemonObj = new DataContainer(pokemonObj.name, []);
+
+  // add abilities
+  newPokemonObj.children.push(
+    getPokemonAttribute(pokemonObj.abilities, 'abilities'));
+  // add base_experience
+  newPokemonObj.children.push(
+    getPokemonProperty(pokemonObj.base_experience, 'base_experience'));
+  // add height
+  newPokemonObj.children.push(getPokemonProperty(pokemonObj.height, 'height'));
+  // add id
+  newPokemonObj.children.push(getPokemonProperty(pokemonObj.id, 'id'));
+  // add moves, the getPokemonAttribute() returns too many dataContainers so it's wrapped 
+  // with the  nodeShrinker wrapper
+  newPokemonObj.children.push(nodeShrinker(getPokemonAttribute(pokemonObj.moves, 'moves')));
+  // add game indices
+  newPokemonObj.children.push(
+    getPokemonAttribute(pokemonObj.game_indices, 'game indices'));
+  // add stats
+  newPokemonObj.children.push(getPokemonStats(pokemonObj.stats, 'stats'));
+  // add type
+  newPokemonObj.children.push(getPokemonAttribute(pokemonObj.types, 'type'));
+  return newPokemonObj;
+}
+        </pre>
+
+        <p>
+          Next is a function to take a pokemon object property that contains a raw datatype,
+          usually an integer, and place it in a DataContainer object and return it.
+          The name param will be the name of the DataContainer
+        </p>
+        <pre class="prettyprint left-align">
+function getPokemonProperty(pokemonObjProp, name) {
+  var dataContainer = new DataContainer(name, []);
+  dataContainer.children.push({
+    name: pokemonObjProp.toString()
+  });
+  return dataContainer;
+}
+        </pre>
+
+        <p>
+          Now a function takes an array of objects labed attributeObjArray that is taken 
+          from the JSON repsonse pokemon object. It then loops through
+          each object to check firstly if it has a futher nested object. If so it 
+          then checks if it has a property called name and if it contains a string.
+          If so the value is extracted and placed in a new DataContainer which is
+          then added to the children array of the parent DataContainer that will 
+          be returned at completion. Name param is the name of the data container.
+        </p>
+        <pre class="prettyprint left-align">
+function getPokemonAttribute(attributeObjArray, name) {
+  //Parent data container
+  var dataContainer = new DataContainer(name, []);
+
+  for (let i = 0; i < attributeObjArray.length; i++) {
+    var innerArray = Object.values(attributeObjArray[i]);
+    for (var j = 0; j < innerArray.length; j++) {
+      if (typeof innerArray[j] === 'object') {
+        if (typeof innerArray[j].name === 'string') {
+          dataContainer.children.push(new DataContainer(innerArray[j].name, []));
+        }
+      }
+    } // end of inner for
+  } // end of outer for
+  return dataContainer;
+}
+        </pre>
+
+        <p>
+          This function is a specialist for creating a container for the pokemon object's
+          stats. It MUST be passed the stats array from the pokemon JSON object. The function
+          calls the getPokemonAttribute() and uses the returned DataContainer to add the 
+          additional values to. It then loops through the attributeObjArray again
+          (because the getPokemonAttribute() already done this) and looks up the additional
+          properties to be added, puts them in their own dataContainer, then adds them to the
+          children array of the parent dataContainer that is to be returned by the function.
+        </p>
+        <pre class="prettyprint left-align">
+function getPokemonStats(attributeObjArray, name) {
+  // parent data container
+  var dataContainer = getPokemonAttribute(attributeObjArray, name);
+  // loop through the dataContainer's children array 
+  for (let i = 0; i < dataContainer.children.length; i++) {
+    // get ref to the base_stat and effort property from the attributeObjArray
+    var base_stat = attributeObjArray[i].base_stat;
+    var effort = attributeObjArray[i].effort;
+    // pass the base_stat and effort values to the corrisponding objects in container
+    dataContainer.children[i].children.push(new DataContainer('base stat ' + base_stat, []));
+    dataContainer.children[i].children.push(new DataContainer('effort ' + effort, []));
+  } // end of for
+  return dataContainer;
+}
+        </pre>
+
+        <p>
+          Next, is a function to take a DataContainer object and split it into 4 DataContainer
+          objects, then place them inside a new DataContainer object and return it.
+          MUST be passed a DataContainer that has more than or equal to 4 child objects.
+
+          This also contains a nested function to create an object and fill it with the subset of
+          the moves, takes a name for the object as an argument.
+        </p>
+        <pre class="prettyprint left-align">
+function nodeShrinker(dataContainer) {
+  var newDataContainer = new DataContainer(dataContainer.name, []);
+  let total = dataContainer.children.length;
+  let subGroup = 0;
+  if (total % 4 === 0) {
+    subGroup = total / 4;
+  } else {
+    subGroup = (total - (total % 4)) / 4;
+  }
+  // function to create an object and fill it with the subset of
+  // the moves, takes a name for the object
+  function fillMoveObject(start, end, name) {
+    var moveObject = new DataContainer(name, []);
+    for (var i = start; i < end; i++) {
+      moveObject.children.push(dataContainer.children[i]);
+    }
+    return moveObject;
+  }
+  var set1 = fillMoveObject(0, subGroup, 'set1');
+  var set2 = fillMoveObject(subGroup, subGroup * 2, 'set2');
+  var set3 = fillMoveObject(subGroup * 2, subGroup * 3, 'set3');
+  var set4 = fillMoveObject(subGroup * 3, total, 'set4');
+
+  newDataContainer.children.push(set1);
+  newDataContainer.children.push(set2);
+  newDataContainer.children.push(set3);
+  newDataContainer.children.push(set4);
+
+  return newDataContainer;
+}
+        </pre>
+        <p>
+          Lastly is the clearing and error handling functions. After each time the doD3
+          function is run there is left over text in the input box, a possible error message
+          generated and a possible error message that needs removed. This is all achived
+          with more DOM manipulation functions.
+          The first is clearQueryData which is used to clear the tree-container div of the previous d3 visualisation
+          and to clear the text in the input field. The loop will iterate until there is
+          no child elements in the container. During the loop the removeChild function is called
+          which simply removes the child element. Then the function sets the userIput value
+          attribute to an empty string and calls the clearError function.
+        </p>
+        <pre class="prettyprint left-align">
+function clearQueryData() {
+  // clear the tree-container of the previous D3
+  while (treeContainer.firstChild) {
+    treeContainer.removeChild(treeContainer.firstChild);
+    if (treeContainer.firstChild) {
+      treeContainer.removeChild(treeContainer.firstChild);
+    }
+  }
+  // clear input box, remove error
+  userInput.value = '';
+  clearError(userInput.parentElement);
+}
+        </pre>
+
+        <p>
+          Next is the createErrorMessage funciton. This is a function to create a paragrapgh element
+          that contains an error message to inform the user
+          That the pokemon name they input was not found. takes a parent element as an argument,
+          creates an element, adds a color attribute and id to it, appends it to parent element
+          then clears the text box for the next input. The reason the id is added is so
+          it can be looked up easily on the DOM.
+        </p>
+        <pre class="prettyprint left-align">
+function createErrorMsg(parent) {
+  // const parent = userInput.parentElement;
+  const errMsg = document.createElement('p');
+  errMsg.innerHTML = 'Pokemon not Found!!!';
+  errMsg.style.color = 'red';
+  errMsg.id = 'error-message';
+  parent.appendChild(errMsg);
+  // clear input box and remove error mesg
+  userInput.value = '';
+
+}
+        </pre>
+        <p>
+          Next is the clearError function. Function to remove the error message element from the DOM.
+          Takes a parent element as an argument so that it can be used on different parent
+          elements (containers). It then removes the error message p element from the parent
+          container.
+        </p>
+        <pre class="prettyprint left-align">
+function clearError(parent) {
+  var errorElemt = document.getElementById('error-message');
+  if (errorElemt) {
+    parent.removeChild(errorElemt);
+  }
+}
+        </pre>
+
+        <h6>DoD3Fullscreen</h6>
+        <p>
+          This additional script is to provide a fullscreen feature in a new tab so that
+          the user can have multiple pokemon visualisations to compare. Also because on
+          mobile devices it is hard to see and use so being able to view on a full page makes
+          it more usable.
+          The code is almost the same as the getPokemon.js script's fetch function but it has
+          most of the listeners removed.
+          The first part of the code is creating a new URLSearchParams object. This is part
+          of the javascript langauge that allows interaction with a website's query
+          strings. It comes with built in functions and I have used the .get with the 'pokemon'
+          argument which will return value of the string query. For more info on URLSearchParams
+          visit <a href="https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams">this link</a>
+          The rest of the declatrations are the same as the getPokemon.js page.
+        </p>
+        <pre class="prettyprint left-align">
+var urlParams = new URLSearchParams(window.location.search);
+var api = 'https://pokeapi.co/api/v2/pokemon/';
+var pokemonName = urlParams.get('pokemon');
+var treeContainer = document.getElementById('tree-container');
+        </pre>
+        <p>
+          The fetch function works the same but had to be rewritten to remove references to
+          DOM objects that do not exisit on the the pokemonFullscreen page. This function
+          contains the same code from inside the clearQueryData function. The reason for this is
+          because that function has an additional feature for removing input strings from
+          the input box and this does not exist on the pokemonFullscreen.html page. Lastly
+          the doD3 function contains the additional argument of true, because it is being used
+          in a fullscreen context. This is called in the window resize listener and the fetch
+          function.
+          Lastly is the .catch function which is the same as the getPokemon.js script but it
+          only logs the error to the conosle.
+        </p>
+        <pre class="prettyprint left-align">
+fetch(api + pokemonName)
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    var newPokemon = createPokeJson(myJson);
+    // // add the doD3() to the window resize listener so the doD3 can be called
+    // // with the latest pokemon object thanks to closures
+    window.addEventListener('resize', function() {
+      // clear treeContainer, snippet taken from the clearQueryData() in getPokemon.js
+      while (treeContainer.firstChild) {
+        treeContainer.removeChild(treeContainer.firstChild);
+        if (treeContainer.firstChild) {
+          treeContainer.removeChild(treeContainer.firstChild);
+        }
+      }
+      doD3(newPokemon, true);
+    });
+
+    doD3(newPokemon, true);
+  })
+  .catch(err => {
+    console.log(err);// log the error message from ajax req
+  });
+        </pre>
+      </div>
     </div>
 
 
@@ -163,6 +614,7 @@
   <script type="text/javascript" src="js/materialize.min.js"></script>
 
   <script src="js/materialAddons.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 </body>
 
 </html>
